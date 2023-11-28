@@ -127,6 +127,7 @@ public class JunitTestSchedule {
         assertEquals(adto.end_time(), adtor.end_time());
         assertEquals(adto.date(), adtor.date());
         assertEquals(adto.movieTitle(), adtor.movieTitle());
+        assertEquals(adto.movieId(), adtor.movieId());
         assertEquals(adto.roomId(), adtor.roomId());
     }
 

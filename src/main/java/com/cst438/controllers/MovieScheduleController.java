@@ -19,77 +19,77 @@ import java.util.List;
 @CrossOrigin
 public class MovieScheduleController {
 
-    @Autowired
-    private ScheduleRepository scheduleRepository;
+	@Autowired
+	private ScheduleRepository scheduleRepository;
 
-    @Autowired
-    private MovieRepository movieRepository;
+	@Autowired
+	private MovieRepository movieRepository;
 
-    @Autowired
-    private RoomRepository roomRepository;
-    
-    @GetMapping("/schedule")
-    public ScheduleDTO[] getAllScheduleItems() {
-        List<Schedule> scheduleItems = (List<Schedule>) scheduleRepository.findAll();
-        ScheduleDTO[] result = new ScheduleDTO[scheduleItems.size()];
-        for (int i = 0; i < scheduleItems.size(); i++) {
-            Schedule schedule = scheduleItems.get(i);
-            ScheduleDTO dto = new ScheduleDTO(
-                    schedule.getSchedule_id(),
-                    schedule.getStart_time(),
-                    schedule.getEnd_time(),
-                    schedule.getDate().toString(),
-                    schedule.getMovie().getMovie_id(),
-                    schedule.getMovie().getMovie_title(),
-                    schedule.getRoom().getRoom_id(),
-                    schedule.getRoom().getCapacity()
-            );
-            result[i] = dto;
-        }
-        return result;
-    }
-    
-    
-    @GetMapping("/schedule/{id}")
-	public ScheduleDTO getSchedule(@PathVariable("id") int id) {	
-		
+	@Autowired
+	private RoomRepository roomRepository;
+
+	@GetMapping("/schedule")
+	public ScheduleDTO[] getAllScheduleItems() {
+		List<Schedule> scheduleItems = (List<Schedule>) scheduleRepository.findAll();
+		ScheduleDTO[] result = new ScheduleDTO[scheduleItems.size()];
+		for (int i = 0; i < scheduleItems.size(); i++) {
+			Schedule schedule = scheduleItems.get(i);
+			ScheduleDTO dto = new ScheduleDTO(
+					schedule.getSchedule_id(),
+					schedule.getStart_time(),
+					schedule.getEnd_time(),
+					schedule.getDate().toString(),
+					schedule.getMovie().getMovie_id(),
+					schedule.getMovie().getMovie_title(),
+					schedule.getRoom().getRoom_id(),
+					schedule.getRoom().getCapacity()
+			);
+			result[i] = dto;
+		}
+		return result;
+	}
+
+
+	@GetMapping("/schedule/{id}")
+	public ScheduleDTO getSchedule(@PathVariable("id") int id) {
+
 		Schedule schedules = scheduleRepository.findById(id).orElse(null);
 		if (schedules == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "schedule not found." + id );
 		}
-		
+
 		ScheduleDTO dto = new ScheduleDTO(
-				 schedules.getSchedule_id(),
-                 schedules.getStart_time(),
-                 schedules.getEnd_time(),
-                 schedules.getDate().toString(),
-                 schedules.getMovie().getMovie_id(),
-                 schedules.getMovie().getMovie_title(),
-                 schedules.getRoom().getRoom_id(),
-                 schedules.getRoom().getCapacity()
-         );
+				schedules.getSchedule_id(),
+				schedules.getStart_time(),
+				schedules.getEnd_time(),
+				schedules.getDate().toString(),
+				schedules.getMovie().getMovie_id(),
+				schedules.getMovie().getMovie_title(),
+				schedules.getRoom().getRoom_id(),
+				schedules.getRoom().getCapacity()
+		);
 		return dto;
 	}
-    
-    
-    @PutMapping("/schedule/{id}")
+
+
+	@PutMapping("/schedule/{id}")
 	public void updateSchedule(@PathVariable("id") int id, @RequestBody ScheduleDTO adto) {
-    	
+
 		Schedule s = scheduleRepository.findById(id).orElse(null);
 		if (s ==null) {
 			throw  new ResponseStatusException( HttpStatus.NOT_FOUND, "schedule not found or not authorized "+id);
 		}
-		
+
 		Movie m = movieRepository.findByTitle(adto.movieTitle());
 		if (m ==null) {
 			throw  new ResponseStatusException( HttpStatus.NOT_FOUND, "movie not found or not authorized "+ adto.movieId());
 		}
-		
+
 		Room r = roomRepository.findById(adto.roomId()).orElse(null);
 		if (r == null) {
 			throw  new ResponseStatusException( HttpStatus.BAD_REQUEST, "Room not found or not authorized " + adto.roomId());
 		}
-		
+
 		s.setDate(java.sql.Date.valueOf(adto.date()));
 		s.setStart_time(adto.start_time());
 		s.setEnd_time(adto.end_time());
@@ -97,9 +97,9 @@ public class MovieScheduleController {
 		s.setRoom(r);
 		scheduleRepository.save(s);
 	}
-    
-    
-    @PostMapping("/schedule")
+
+
+	@PostMapping("/schedule")
 	@Transactional
 	public void createSchedule(@RequestBody ScheduleDTO adto) {
 		Movie m = movieRepository.findByTitle(adto.movieTitle());
@@ -121,18 +121,18 @@ public class MovieScheduleController {
 		s.setRoom(r);
 		scheduleRepository.save(s);
 	}
-    
-    
-    @DeleteMapping("/schedule/{id}")
+
+
+	@DeleteMapping("/schedule/{id}")
 	public void deleteSchedule(@PathVariable("id") int id) {
 		Schedule s = scheduleRepository.findById(id).orElse(null);
 		if (s==null) {
 			throw  new ResponseStatusException( HttpStatus.BAD_REQUEST, "room not found or not authorized " + id);
 		}
-		
+
 		scheduleRepository.deleteById(id);
-		
+
 	}
-  
-    
+
+
 }
